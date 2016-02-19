@@ -1,5 +1,9 @@
 package Scanner;
 
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
+import com.google.gson.reflect.TypeToken;
+import com.oracle.javafx.jmx.json.JSONDocument;
 import com.oracle.javafx.jmx.json.JSONReader;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
@@ -8,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,7 +26,7 @@ import java.util.TreeMap;
 public class Downloader extends ScannerAbstract {
     private final String clientID = "Client-ID 1eb2bfc9d5463c4"; //new Base64().encode("Client-ID 1eb2bfc9d5463c4".getBytes());
 
-    private Map query(URL url) {
+    private Response query(URL url) {
         System.out.println("Quarrying");
         try {
             TreeMap headers = new TreeMap<String, String>();
@@ -31,7 +36,9 @@ public class Downloader extends ScannerAbstract {
             BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
             InputStream response = getStream(url, headers);
-            Map<String, Object> data = getJSON(response);
+            Response data = getJSON(response);
+
+            return data;
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -42,15 +49,13 @@ public class Downloader extends ScannerAbstract {
 
     public boolean begin() {
         try {
-            Object queryData = query(new URL("https://api.imgur.com/3/topics/aww"));
-            if(queryData instanceof Map) {
-                TreeMap<String, Object> info = new TreeMap<String, Object>();
-                //info.putAll(((Map<String, Object>) querryData).entrySet());
-                TreeMap<String, Object> data = (TreeMap<String, Object>) info.get("data");
+            Response queryData = query(this.getUrl());
+            if(queryData != null) {
+                ImgurImage[] data = queryData.getData();
 
-                for(Map.Entry<String, Object> entry : data.entrySet()) {
-                    ImgurImage image = new ImgurImage((TreeMap<String, Object>) entry);
-                    System.out.println("Download " + image.getProperty("link"));
+                for(int i = 0; i < data.length; i++) {
+                    System.out.println("Download " + data[i]);
+                    this.fetchFile(new URL(data[i].getLink()), this.getDestination(), i);
                 }
             }
         }

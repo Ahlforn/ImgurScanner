@@ -1,5 +1,7 @@
 package Scanner;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import sun.font.Script;
 import sun.net.www.MimeEntry;
 import sun.net.www.MimeTable;
@@ -10,11 +12,14 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.*;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.Buffer;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Anders Hofmeister Brønden on 24/12/15.
@@ -105,23 +110,12 @@ public abstract class ScannerAbstract implements Scanner {
         }
     }
 
-    public Map getJSON(InputStream input) {
-        ScriptEngineManager sem = new ScriptEngineManager();
-        engine = sem.getEngineByName("javascript");
-        String json = new String(processStream(input));
-        String script = "Java.asJSONCompatible(" + json + ")";
+    public Response getJSON(InputStream input) {
+        Gson gson = new Gson();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        Response data = gson.fromJson(reader, Response.class);
 
-        try {
-            Object result = engine.eval(script);
-            Map contents = (Map) result;
-
-            return contents;
-        }
-        catch(ScriptException e) {
-            e.printStackTrace();
-
-            return null;
-        }
+        return data;
     }
 
     public File fetchFile(URL url, File destination, int nr) {
@@ -159,23 +153,30 @@ public abstract class ScannerAbstract implements Scanner {
     }
 
     public String getFileExt(String mimeType) {
-        System.out.println("type: " + mimeType);
-        String extension = "";
+        try {
+            System.out.println("type: " + mimeType);
+            String extension = "";
 
-        MimeTable testTable = MimeTable.getDefaultTable();
-        Enumeration e = testTable.elements();
-        while (e.hasMoreElements()) {
-            MimeEntry entry = (MimeEntry) e.nextElement();
-            String contentType = entry.getType();
-            String extensionString = entry.getExtensionsAsList();
-            String[] extensionArray = extensionString.split(",");
-            extensionString = extensionArray[extensionArray.length - 1];
-            mimeType = mimeType.replaceAll("/", ".*");
-            if (contentType.matches(mimeType)) {
-                extension = extensionString;
-                break;
+            MimeTable testTable = MimeTable.getDefaultTable();
+            Enumeration e = testTable.elements();
+            while (e.hasMoreElements()) {
+                MimeEntry entry = (MimeEntry) e.nextElement();
+                String contentType = entry.getType();
+                String extensionString = entry.getExtensionsAsList();
+                String[] extensionArray = extensionString.split(",");
+                extensionString = extensionArray[extensionArray.length - 1];
+                mimeType = mimeType.replaceAll("/", ".*");
+                if (contentType.matches(mimeType)) {
+                    extension = extensionString;
+                    break;
+                }
             }
+            return extension;
         }
-        return extension;
+        catch(Exception e) {
+            e.getMessage();
+
+            return null;
+        }
     }
 }
