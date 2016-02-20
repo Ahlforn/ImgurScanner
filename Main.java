@@ -8,7 +8,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -98,8 +97,9 @@ public class Main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     Downloader downloader = new Downloader();
-                    downloader.setUrl(new URL("https://api.imgur.com/3/topics/aww"));
+                    downloader.setUrl(new URL(urlText.getText()));
                     downloader.setDestination(new File(destText.getText()));
+                    downloader.setClientID(args[0]);
                     downloader.begin();
                 }
                 catch(MalformedURLException err) {
@@ -108,7 +108,7 @@ public class Main {
             }
         });
 
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.pack();
 
         frame.setVisible(true);

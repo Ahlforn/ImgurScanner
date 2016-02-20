@@ -1,25 +1,16 @@
 package Scanner;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import sun.font.Script;
 import sun.net.www.MimeEntry;
 import sun.net.www.MimeTable;
-
-import javax.activation.MimeType;
-import javax.activation.MimetypesFileTypeMap;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import java.io.*;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.Buffer;
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.TreeMap;
+
 
 /**
  * Created by Anders Hofmeister Brønden on 24/12/15.

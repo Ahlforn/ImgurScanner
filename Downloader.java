@@ -1,33 +1,26 @@
 package Scanner;
 
-import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
-import com.google.gson.reflect.TypeToken;
-import com.oracle.javafx.jmx.json.JSONDocument;
-import com.oracle.javafx.jmx.json.JSONReader;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
-
-import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Map;
 import java.util.TreeMap;
 
 /**
  * Created by Anders Hofmeister Brønden on 23/12/15.
  */
 public class Downloader extends ScannerAbstract {
-    private final String clientID = "Client-ID 1eb2bfc9d5463c4"; //new Base64().encode("Client-ID 1eb2bfc9d5463c4".getBytes());
+    private String clientID;
+
+    public void setClientID(String clientID) {
+        this.clientID = "Client-ID " + clientID;
+    }
 
     private Response query(URL url) {
-        System.out.println("Quarrying");
+        System.out.println("Querying");
         try {
             TreeMap headers = new TreeMap<String, String>();
             URLConnection connection = url.openConnection();
@@ -57,6 +50,8 @@ public class Downloader extends ScannerAbstract {
                     System.out.println("Download " + data[i]);
                     this.fetchFile(new URL(data[i].getLink()), this.getDestination(), i);
                 }
+
+                return true;
             }
         }
         catch(MalformedURLException e) {

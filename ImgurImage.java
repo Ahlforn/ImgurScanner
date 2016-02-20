@@ -1,9 +1,5 @@
 package Scanner;
 
-import java.sql.Timestamp;
-import java.util.Map;
-import java.util.TreeMap;
-
 /**
  * Created by anders on 25/12/15.
  */

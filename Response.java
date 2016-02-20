@@ -1,7 +1,5 @@
 package Scanner;
 
-import java.util.Map;
-
 /**
  * Created by anders on 19/02/16.
  */
