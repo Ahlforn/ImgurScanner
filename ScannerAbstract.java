@@ -1,9 +1,11 @@
 package Scanner;
 
 import com.google.gson.Gson;
+import org.apache.tika.mime.MimeType;
+import org.apache.tika.mime.MimeTypes;
+import org.apache.tika.mime.MimeTypeException;
 import sun.net.www.MimeEntry;
 import sun.net.www.MimeTable;
-import javax.script.ScriptEngine;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -11,15 +13,13 @@ import java.net.URLConnection;
 import java.util.Enumeration;
 import java.util.Map;
 
-
 /**
  * Created by Anders Hofmeister Brønden on 24/12/15.
  */
 public abstract class ScannerAbstract implements Scanner {
     private URL url;
     private File destination;
-    private ScriptEngine engine;
-    Map<String, String> requestProperties;
+    private Map<String, String> requestProperties;
 
     public ScannerAbstract(URL url, File destination) {
         this.url = url;
@@ -113,9 +113,8 @@ public abstract class ScannerAbstract implements Scanner {
         try {
             InputStream in = getStream(url, null);
             String mimeType = URLConnection.guessContentTypeFromStream(in);
-            String extension = getFileExt(mimeType);
 
-            destination = new File(destination.getPath() + "/" + nr + extension);
+            destination = new File(destination.getPath() + url.getFile());
 
             FileOutputStream fos = new FileOutputStream(destination.toString());
             fos.write(processStream(in));
@@ -141,33 +140,5 @@ public abstract class ScannerAbstract implements Scanner {
         if(fetchFile(url, destination) != null) return true;
 
         return false;
-    }
-
-    public String getFileExt(String mimeType) {
-        try {
-            System.out.println("type: " + mimeType);
-            String extension = "";
-
-            MimeTable testTable = MimeTable.getDefaultTable();
-            Enumeration e = testTable.elements();
-            while (e.hasMoreElements()) {
-                MimeEntry entry = (MimeEntry) e.nextElement();
-                String contentType = entry.getType();
-                String extensionString = entry.getExtensionsAsList();
-                String[] extensionArray = extensionString.split(",");
-                extensionString = extensionArray[extensionArray.length - 1];
-                mimeType = mimeType.replaceAll("/", ".*");
-                if (contentType.matches(mimeType)) {
-                    extension = extensionString;
-                    break;
-                }
-            }
-            return extension;
-        }
-        catch(Exception e) {
-            e.getMessage();
-
-            return null;
-        }
     }
 }
