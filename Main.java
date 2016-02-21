@@ -96,11 +96,11 @@ public class Main {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    Downloader downloader = new Downloader();
-                    downloader.setUrl(new URL(urlText.getText()));
-                    downloader.setDestination(new File(destText.getText()));
-                    downloader.setClientID(args[0]);
-                    downloader.begin();
+                    DownloadHandler downloadHandler = new DownloadHandler();
+                    downloadHandler.setUrl(new URL(urlText.getText()));
+                    downloadHandler.setDestination(new File(destText.getText()));
+                    downloadHandler.setClientID(args[0]);
+                    downloadHandler.begin();
                 }
                 catch(MalformedURLException err) {
                     err.printStackTrace();

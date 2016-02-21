@@ -8,7 +8,7 @@ import java.util.TreeMap;
 /**
  * Created by Anders Hofmeister Brønden on 23/12/15.
  */
-public class Downloader extends ScannerAbstract {
+public class DownloadHandler extends ScannerAbstract {
     private String clientID;
 
     public void setClientID(String clientID) {
