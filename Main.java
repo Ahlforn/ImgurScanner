@@ -95,16 +95,13 @@ public class Main {
         downloadButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    DownloadHandler downloadHandler = new DownloadHandler();
-                    downloadHandler.setUrl(new URL(urlText.getText()));
-                    downloadHandler.setDestination(new File(destText.getText()));
-                    downloadHandler.setClientID(args[0]);
-                    downloadHandler.begin();
-                }
-                catch(MalformedURLException err) {
-                    err.printStackTrace();
-                }
+                DownloadHandler downloadHandler = new DownloadHandler();
+                downloadHandler.setGalleryID(urlText.getText());
+                downloadHandler.setDestination(new File(destText.getText()));
+                downloadHandler.setClientID(args[0]);
+                downloadHandler.setApiGalleryBaseURL("https://api.imgur.com/3/gallery/r/");
+                downloadHandler.setPageLimit(2);
+                downloadHandler.begin();
             }
         });
 

@@ -8,6 +8,7 @@ import sun.net.www.MimeEntry;
 import sun.net.www.MimeTable;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Enumeration;
@@ -17,13 +18,31 @@ import java.util.Map;
  * Created by Anders Hofmeister Brønden on 24/12/15.
  */
 public abstract class ScannerAbstract implements Scanner {
-    private URL url;
     private File destination;
     private Map<String, String> requestProperties;
+    private String apiGalleryBaseURL;
+    private String galleryID;
 
-    public ScannerAbstract(URL url, File destination) {
-        this.url = url;
+    public String getGalleryID() {
+        return galleryID;
+    }
+
+    public void setGalleryID(String galleryID) {
+        this.galleryID = galleryID;
+    }
+
+    public String getApiGalleryBaseURL() {
+        return apiGalleryBaseURL;
+    }
+
+    public void setApiGalleryBaseURL(String apiGalleryBaseURL) {
+        this.apiGalleryBaseURL = apiGalleryBaseURL;
+    }
+
+    public ScannerAbstract(String galleryID, File destination) {
+        this.galleryID = galleryID;
         this.destination = destination;
+        this.requestProperties = null;
     }
 
     public ScannerAbstract() {
@@ -39,16 +58,23 @@ public abstract class ScannerAbstract implements Scanner {
     }
 
     public URL getUrl() {
-        return url;
+        try {
+            return new URL(this.apiGalleryBaseURL + galleryID);
+        }
+        catch(MalformedURLException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
-    public void setUrl(URL url) {
-        this.url = url;
+    public String getRawUrl() {
+        return this.apiGalleryBaseURL + galleryID;
     }
 
-    public InputStream getStream() {
+    public InputStream getStream(URL url) {
         try {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setConnectTimeout(5000);
 
             if(requestProperties != null) {
                 for (Map.Entry<String, String> entry : requestProperties.entrySet()) {
@@ -69,17 +95,9 @@ public abstract class ScannerAbstract implements Scanner {
     }
 
     public InputStream getStream(URL url, Map<String, String> requestProperties) {
-        this.url = url;
         this.requestProperties = requestProperties;
 
-        return getStream();
-    }
-
-    public InputStream getStream(URL url) {
-        this.url = url;
-        this.requestProperties = null;
-
-        return getStream();
+        return getStream(url);
     }
 
     public byte[] processStream(InputStream input) {
@@ -137,7 +155,7 @@ public abstract class ScannerAbstract implements Scanner {
     }
 
     public boolean begin() {
-        if(fetchFile(url, destination) != null) return true;
+        if(fetchFile(this.getUrl(), destination) != null) return true;
 
         return false;
     }
