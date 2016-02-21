@@ -1,17 +1,11 @@
 package Scanner;
 
 import com.google.gson.Gson;
-import org.apache.tika.mime.MimeType;
-import org.apache.tika.mime.MimeTypes;
-import org.apache.tika.mime.MimeTypeException;
-import sun.net.www.MimeEntry;
-import sun.net.www.MimeTable;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Enumeration;
 import java.util.Map;
 
 /**

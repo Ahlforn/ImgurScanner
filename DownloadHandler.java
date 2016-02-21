@@ -3,7 +3,6 @@ package Scanner;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,10 +42,9 @@ public class DownloadHandler extends ScannerAbstract {
 
     public boolean begin() {
         try {
-            //ArrayList<Downloader> downloaders = new ArrayList<Downloader>();
             ExecutorService pool = Executors.newFixedThreadPool(10);
             for(int n = 0; n < pageLimit; n++) {
-                Response queryData = query(new URL(this.getRawUrl() + "/" + n));
+                Response queryData = query(new URL(this.getRawUrl() + "/time/" + n));
                 if (queryData != null) {
                     ImgurImage[] data = queryData.getData();
 

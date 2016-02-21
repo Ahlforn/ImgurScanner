@@ -8,8 +8,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * Created by anders on 22/12/15.
@@ -22,23 +20,32 @@ public class Main {
         SpringLayout layout = new SpringLayout();
         contentPane.setLayout(layout);
 
-        JLabel labelUrl = new JLabel("URL", JLabel.TRAILING);
+        JLabel labelUrl = new JLabel("Gallery ID", JLabel.TRAILING);
         JTextField urlText = new JTextField(25);
-        JButton pasteButton = new JButton("Paste");
+        //JButton pasteButton = new JButton("Paste");
 
         JLabel labelDest = new JLabel("Destination", JLabel.TRAILING);
         JTextField destText = new JTextField(25);
         JButton browseButton = new JButton("Browse");
 
+        JPanel pagesPanel = new JPanel();
+        JLabel labelPageLimit = new JLabel("Pages", JLabel.TRAILING);
+        JSpinner pageLimit = new JSpinner();
+        pageLimit.setValue(1);
+
+        pagesPanel.add(labelPageLimit);
+        pagesPanel.add(pageLimit);
+
         contentPane.add(labelUrl);
         contentPane.add(urlText);
-        contentPane.add(pasteButton);
+        contentPane.add(pagesPanel);
         contentPane.add(labelDest);
         contentPane.add(destText);
         contentPane.add(browseButton);
 
         labelUrl.setLabelFor(urlText);
         labelDest.setLabelFor(destText);
+        labelPageLimit.setLabelFor(pageLimit);
 
         SpringUtilities.makeCompactGrid(contentPane, 2, 3, 6, 6, 6, 6);
 
@@ -59,6 +66,7 @@ public class Main {
         layout.putConstraint(SpringLayout.WEST, progress, 0, SpringLayout.WEST, downloadButton);
         layout.putConstraint(SpringLayout.EAST, progress, 0, SpringLayout.EAST, downloadButton);
 
+        /*
         pasteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -75,6 +83,7 @@ public class Main {
                 }
             }
         });
+        */
 
         browseButton.addActionListener(new ActionListener() {
             @Override
@@ -100,7 +109,8 @@ public class Main {
                 downloadHandler.setDestination(new File(destText.getText()));
                 downloadHandler.setClientID(args[0]);
                 downloadHandler.setApiGalleryBaseURL("https://api.imgur.com/3/gallery/r/");
-                downloadHandler.setPageLimit(2);
+                downloadHandler.setPageLimit((int)pageLimit.getValue());
+
                 downloadHandler.begin();
             }
         });
