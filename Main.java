@@ -16,6 +16,13 @@ public class Main {
     public static void main(String[] args) {
         JFrame frame = new JFrame("ImgurScanner");
 
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }
+        catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
+
         Container contentPane = frame.getContentPane();
         SpringLayout layout = new SpringLayout();
         contentPane.setLayout(layout);
@@ -104,14 +111,28 @@ public class Main {
         downloadButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DownloadHandler downloadHandler = new DownloadHandler();
+                DownloadHandler downloadHandler = new DownloadHandler(new Callback() {
+                    @Override
+                    public void callback() {
+                        progress.setVisible(false);
+                        progress.repaint();
+                        downloadButton.setVisible(true);
+                        downloadButton.repaint();
+                    }
+                });
                 downloadHandler.setGalleryID(urlText.getText());
                 downloadHandler.setDestination(new File(destText.getText()));
                 downloadHandler.setClientID(args[0]);
                 downloadHandler.setApiGalleryBaseURL("https://api.imgur.com/3/gallery/r/");
                 downloadHandler.setPageLimit((int)pageLimit.getValue());
+                downloadHandler.setProgress(progress);
 
-                downloadHandler.begin();
+                downloadButton.setVisible(false);
+                downloadButton.repaint();
+                progress.setVisible(true);
+                progress.repaint();
+
+                downloadHandler.start();
             }
         });
 

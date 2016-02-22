@@ -9,9 +9,9 @@ import java.net.URL;
 public class Downloader implements Runnable {
     private URL url;
     private File destination;
-    private ScannerAbstract handler;
+    private DownloadHandler handler;
 
-    public Downloader(URL url, File destination, ScannerAbstract handler) {
+    public Downloader(URL url, File destination, DownloadHandler handler) {
         this.url = url;
         this.destination = destination;
         this.handler = handler;
@@ -20,5 +20,7 @@ public class Downloader implements Runnable {
     public void run() {
         System.out.println("Download " + url.toString());
         handler.fetchFile(url, destination);
+        handler.getDls().remove();
+        handler.updateProgress();
     }
 }
