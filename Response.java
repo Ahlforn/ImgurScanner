@@ -1,34 +1,11 @@
 package Scanner;
 
 /**
- * Created by anders on 19/02/16.
+ * Created by hirom on 05-03-2016.
  */
-public class Response {
-    ImgurImage[] data;
-    boolean success;
-    int status;
-
-    public ImgurImage[] getData() {
-        return data;
-    }
-
-    public void setData(ImgurImage[] data) {
-        this.data = data;
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
+public interface Response {
+    public Object getData();
+    public boolean isSuccess();
+    public int getStatus();
+    public ImgurImage[] getImages();
 }

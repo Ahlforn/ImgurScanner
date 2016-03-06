@@ -73,25 +73,6 @@ public class Main {
         layout.putConstraint(SpringLayout.WEST, progress, 0, SpringLayout.WEST, downloadButton);
         layout.putConstraint(SpringLayout.EAST, progress, 0, SpringLayout.EAST, downloadButton);
 
-        /*
-        pasteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-                Transferable t = c.getContents(this);
-
-                if(t == null) return;
-
-                try {
-                    urlText.setText((String) t.getTransferData(DataFlavor.stringFlavor));
-                }
-                catch (Exception err) {
-                    err.printStackTrace();
-                }
-            }
-        });
-        */
-
         browseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -123,7 +104,7 @@ public class Main {
                 downloadHandler.setGalleryID(urlText.getText());
                 downloadHandler.setDestination(new File(destText.getText()));
                 downloadHandler.setClientID(args[0]);
-                downloadHandler.setApiGalleryBaseURL("https://api.imgur.com/3/gallery/r/");
+                downloadHandler.setApiGalleryBaseURL("https://api.imgur.com/3/");
                 downloadHandler.setPageLimit((int)pageLimit.getValue());
                 downloadHandler.setProgress(progress);
 

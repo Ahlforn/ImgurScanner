@@ -37,7 +37,6 @@ public class DownloadHandler extends ScannerAbstract implements Runnable {
     }
 
     public void setClientID(String clientID) {
-        // Authorization: Client-ID YOUR_CLIENT_ID
         this.clientID = "Client-ID " + clientID;
     }
 
@@ -45,26 +44,35 @@ public class DownloadHandler extends ScannerAbstract implements Runnable {
         this.c = c;
     }
 
-    private Response query(URL url) {
+    private Response query(URL url, GalleryTypes type) {
         System.out.println("Querying");
 
         TreeMap headers = new TreeMap<String, String>();
         headers.put("Authorization", this.clientID);
 
         InputStream response = getStream(url, headers);
-        Response data = getJSON(response);
 
-        return data;
+        return getJSON(response, type);
     }
 
     public boolean begin() {
         try {
             pool = Executors.newFixedThreadPool(10);
             dls = new LinkedBlockingQueue<String>();
+
+            Response queryData;
+
             for(int n = 0; n < pageLimit; n++) {
-                Response queryData = query(new URL(this.getRawUrl() + "/time/" + n));
+                queryData = (Subreddit) query(new URL(this.getRawUrl() + "/time/" + n), GalleryTypes.SUBREDDIT);
+System.out.println(new URL(this.getRawUrl() + "/time/" + n));
+                if(queryData.getImages().length == 0) {
+                    System.out.println(this.getRawUrl(GalleryTypes.GALLERY));
+                    queryData = (Gallery) query((new URL(this.getRawUrl(GalleryTypes.GALLERY))), GalleryTypes.GALLERY);
+                    n = pageLimit;
+                }
+
                 if (queryData != null) {
-                    ImgurImage[] data = queryData.getData();
+                    ImgurImage[] data = (ImgurImage[]) queryData.getImages();
 
                     for (int i = 0; i < data.length; i++) {
                         Downloader dl = new Downloader(new URL(data[i].getLink()), this.getDestination(), this);
@@ -94,7 +102,6 @@ public class DownloadHandler extends ScannerAbstract implements Runnable {
 
     public void updateProgress() {
         if(progress != null) {
-            //double value = 100.0 - (((double) dls.size() / (double) downloadCount) * 100.0);
             progress.setMaximum(downloadCount);
             progress.setValue(downloadCount - dls.size());
             progress.repaint();

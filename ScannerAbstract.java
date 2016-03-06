@@ -15,6 +15,7 @@ public abstract class ScannerAbstract implements Scanner {
     private File destination;
     private Map<String, String> requestProperties;
     private String apiGalleryBaseURL;
+    private String[] apiUrlPrefixes;
     private String galleryID;
 
     public String getGalleryID() {
@@ -37,6 +38,9 @@ public abstract class ScannerAbstract implements Scanner {
         this.galleryID = galleryID;
         this.destination = destination;
         this.requestProperties = null;
+        this.apiUrlPrefixes = new String[2];
+        this.apiUrlPrefixes[GalleryTypes.GALLERY.ordinal()] = "gallery/";
+        this.apiUrlPrefixes[GalleryTypes.SUBREDDIT.ordinal()] = "r/";
     }
 
     public ScannerAbstract() {
@@ -53,7 +57,7 @@ public abstract class ScannerAbstract implements Scanner {
 
     public URL getUrl() {
         try {
-            return new URL(this.apiGalleryBaseURL + galleryID);
+            return new URL(getRawUrl());
         }
         catch(MalformedURLException e) {
             System.out.println(e.getMessage());
@@ -61,8 +65,17 @@ public abstract class ScannerAbstract implements Scanner {
         }
     }
 
+    public String getRawUrl(GalleryTypes type) {
+        String output = this.apiGalleryBaseURL + this.apiUrlPrefixes[GalleryTypes.GALLERY.ordinal()];
+        if(type == GalleryTypes.SUBREDDIT) output += this.apiUrlPrefixes[type.ordinal()];
+
+        output += this.galleryID;
+
+        return output;
+    }
+
     public String getRawUrl() {
-        return this.apiGalleryBaseURL + galleryID;
+        return getRawUrl(GalleryTypes.SUBREDDIT);
     }
 
     public InputStream getStream(URL url) {
@@ -113,12 +126,20 @@ public abstract class ScannerAbstract implements Scanner {
         }
     }
 
-    public Response getJSON(InputStream input) {
+    public Response getJSON(InputStream input, GalleryTypes type) {
         Gson gson = new Gson();
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-        Response data = gson.fromJson(reader, Response.class);
 
-        return data;
+        if(type == GalleryTypes.SUBREDDIT) {
+            return (Subreddit) gson.fromJson(reader, Subreddit.class);
+        }
+        else {
+            return (Gallery) gson.fromJson(reader, Gallery.class);
+        }
+    }
+
+    public Response getJSON(InputStream input) {
+        return getJSON(input, GalleryTypes.SUBREDDIT);
     }
 
     public File fetchFile(URL url, File destination, int nr) {
