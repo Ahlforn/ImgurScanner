@@ -12,26 +12,21 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 /**
- * Created by anders on 22/12/15.
+ * Created by Anders Hofmeister Brønden on 22/12/15.
  */
 public class Main {
     public static void main(String[] args) {
         JFrame frame = new JFrame("ImgurScanner");
         ConfigHandler conf = null;
-        String id = null;
 
         try {
             conf = new ConfigHandler("config.properties");
-            id = conf.getString("ClientID");
-            System.out.print(id);
         }
         catch (Exception e) {
-            System.out.print("Client ID not specified.");
             e.printStackTrace();
         }
 
         final ConfigHandler config = conf;
-        final String clientID = id;
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -98,10 +93,17 @@ public class Main {
         layout.putConstraint(SpringLayout.WEST, optionsButton, 0, SpringLayout.WEST, browseButton);
         layout.putConstraint(SpringLayout.EAST, optionsButton, 0, SpringLayout.EAST, browseButton);
 
-        if(config.getString("ClientID").length() > 0) {
-            downloadButton.setEnabled(true);
+        try {
+            destText.setText(config.getString("Destination"));
+
+            if(config.getString("ClientID").length() > 0) {
+                downloadButton.setEnabled(true);
+            }
+            else {
+                downloadButton.setEnabled(false);
+            }
         }
-        else {
+        catch (NullPointerException e) {
             downloadButton.setEnabled(false);
         }
 
@@ -135,7 +137,7 @@ public class Main {
                 });
                 downloadHandler.setGalleryID(urlText.getText());
                 downloadHandler.setDestination(new File(destText.getText()));
-                downloadHandler.setClientID(clientID);
+                downloadHandler.setClientID(config.getString("ClientID"));
                 downloadHandler.setApiGalleryBaseURL("https://api.imgur.com/3/");
                 downloadHandler.setPageLimit((int)pageLimit.getValue());
                 downloadHandler.setProgress(progress);
@@ -168,7 +170,12 @@ public class Main {
 
                 SpringUtilities.makeCompactGrid(contentPane, 1, 3, 6, 6, 6, 6);
 
-                textId.setText(config.getString("ClientID"));
+                try {
+                    textId.setText(config.getString("ClientID"));
+                }
+                catch (NullPointerException ex) {
+                    textId.setText("");
+                }
 
                 saveButton.addActionListener(new ActionListener() {
                     @Override
@@ -177,16 +184,19 @@ public class Main {
                             config.setProperty("ClientID", textId.getText());
                             config.save();
                             frame.dispose();
+
+                            if(config.getString("ClientID").length() > 0) {
+                                downloadButton.setEnabled(true);
+                            }
+                            else {
+                                downloadButton.setEnabled(false);
+                            }
                         }
                         catch(ConfigurationException ex) {
-                            ex.printStackTrace();
+                            System.out.println("Config not available.");
                         }
-
-                        if(config.getString("ClientID").length() > 0) {
-                            downloadButton.setEnabled(true);
-                        }
-                        else {
-                            downloadButton.setEnabled(false);
+                        catch(NullPointerException ex) {
+                            System.out.println("Config not available.");
                         }
                     }
                 });
@@ -195,6 +205,19 @@ public class Main {
                 frame.pack();
 
                 frame.setVisible(true);
+            }
+        });
+
+        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                try {
+                    config.setProperty("Destination", destText.getText());
+                    config.save();
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
 

@@ -1,6 +1,7 @@
 package Scanner;
 
 import javax.swing.*;
+import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -59,23 +60,36 @@ public class DownloadHandler extends ScannerAbstract implements Runnable {
         try {
             pool = Executors.newFixedThreadPool(10);
             dls = new LinkedBlockingQueue<String>();
+            String title = null;
 
             Response queryData;
 
             for(int n = 0; n < pageLimit; n++) {
                 queryData = (Subreddit) query(new URL(this.getRawUrl() + "/time/" + n), GalleryTypes.SUBREDDIT);
+                title = this.getGalleryID();
 System.out.println(new URL(this.getRawUrl() + "/time/" + n));
                 if(queryData.getImages().length == 0) {
                     System.out.println(this.getRawUrl(GalleryTypes.GALLERY));
                     queryData = (Gallery) query((new URL(this.getRawUrl(GalleryTypes.GALLERY))), GalleryTypes.GALLERY);
+                    try {
+                        title = ((ImgurGallery) queryData.getData()).getTitle();
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     n = pageLimit;
+                }
+
+                File dir = new File(this.getDestination().getPath() + "/" + title);
+                if(!dir.isDirectory()) {
+                    dir.mkdir();
                 }
 
                 if (queryData != null) {
                     ImgurImage[] data = (ImgurImage[]) queryData.getImages();
 
                     for (int i = 0; i < data.length; i++) {
-                        Downloader dl = new Downloader(new URL(data[i].getLink()), this.getDestination(), this);
+                        Downloader dl = new Downloader(new URL(data[i].getLink()), dir, this);
                         dls.add(data[i].getId());
                         pool.submit(dl);
                     }

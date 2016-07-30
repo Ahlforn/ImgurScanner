@@ -4,7 +4,7 @@ import java.io.File;
 import java.net.URL;
 
 /**
- * Created by hirom on 21-02-2016.
+ * Created by Anders Hofmeister Brønden on 21-02-2016.
  */
 public class Downloader implements Runnable {
     private URL url;
